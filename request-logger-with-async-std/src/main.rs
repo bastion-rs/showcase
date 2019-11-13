@@ -83,7 +83,7 @@ fn main() {
                     workers.elems()[round_robin].ask(stream.unwrap()).unwrap();
                 }
 
-                // Send a signal to system that computation is finished.
+                // Unreachable, but showing the logic explicitly is nice.
                 Bastion::stop();
 
                 Ok(())
