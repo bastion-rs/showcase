@@ -21,8 +21,47 @@ fn main() {
 
     Bastion::init();
 
-    // Workers that process the work.
-    let workers = Bastion::children(|children: Children| {
+    //
+    // Server entrypoint
+    Bastion::children(|children: Children| {
+        children.with_exec(move |_ctx: BastionContext| {
+            // Get a shadowed sharable reference of workers.
+            let workers = get_workers();
+            let workers = Arc::new(workers);
+
+            async move {
+                println!("Server is starting!");
+
+                let listener = TcpListener::bind("127.0.0.1:2278").unwrap();
+
+                // Open logfile with async-std!
+                let _ = File::create("requests.log").await.unwrap();
+
+                let mut round_robin = 0;
+                for stream in listener.incoming() {
+                    // Make a fair distribution to workers
+                    round_robin += 1;
+                    round_robin %= workers.elems().len();
+
+                    // Distribute tcp streams
+                    workers.elems()[round_robin].ask(stream.unwrap()).unwrap();
+                }
+
+                // Unreachable, but showing the logic explicitly is nice.
+                Bastion::stop();
+
+                Ok(())
+            }
+        })
+    })
+        .expect("Couldn't start a new children group.");
+
+    Bastion::start();
+    Bastion::block_until_stopped();
+}
+
+fn get_workers() -> ChildrenRef {
+    Bastion::children(|children: Children| {
         children
             .with_redundancy(10) // Let's have a pool of ten workers.
             .with_exec(move |ctx: BastionContext| {
@@ -55,43 +94,5 @@ fn main() {
                 }
             })
     })
-        .expect("Couldn't start a new children group.");
-
-    // Get a shadowed sharable reference of workers.
-    let workers = Arc::new(workers);
-
-    //
-    // Server entrypoint
-    Bastion::children(|children: Children| {
-        children.with_exec(move |_ctx: BastionContext| {
-            let workers = workers.clone();
-            async move {
-                println!("Server is starting!");
-
-                let listener = TcpListener::bind("127.0.0.1:2278").unwrap();
-
-                // Open logfile with async-std!
-                let _ = File::create("requests.log").await.unwrap();
-
-                let mut round_robin = 0;
-                for stream in listener.incoming() {
-                    // Make a fair distribution to workers
-                    round_robin += 1;
-                    round_robin %= workers.elems().len();
-
-                    // Distribute tcp streams
-                    workers.elems()[round_robin].ask(stream.unwrap()).unwrap();
-                }
-
-                // Unreachable, but showing the logic explicitly is nice.
-                Bastion::stop();
-
-                Ok(())
-            }
-        })
-    })
-        .expect("Couldn't start a new children group.");
-
-    Bastion::start();
-    Bastion::block_until_stopped();
+        .expect("Couldn't start a new children group.")
 }
