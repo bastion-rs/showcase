@@ -1,0 +1,33 @@
+# The name of the service.
+service: bastion-aws-lambda
+
+# We want to host the project on AWS using Rust.
+provider:
+    name: aws
+    runtime: rust
+    environment:
+      RUST_BACKTRACE: 'full'
+
+# To automate building and deployment, we'll use a plugin specifically made for Rust.
+plugins:
+    - serverless-rust
+
+# This tells the framework to package each function separately with its own container.
+package:
+    individually: true
+
+# Here is where we define all our functions (each living in a separate Cargo crate).
+functions:
+    # In this project, we only have one lambda function called `page_fetcher`.
+    page_fetcher:
+        # The name of the handler must match the name of the crate (not the actual function defined within).
+        handler: page_fetcher
+
+        # This tells AWS when to trigger our function.
+        events:
+            # The event we're interested in is an incoming HTTP request.
+            - http:
+                  # The function will be called for every POST request that is made
+                  # onto the `/page_fetcher` endpoint.
+                  path: /page_fetcher
+                  method: POST
