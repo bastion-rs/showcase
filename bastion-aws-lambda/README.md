@@ -2,16 +2,19 @@
 
 In this example we are using Bastion to send a get request to given list of URLs inside an AWS Lambda.
 
+# Requirements
+
+Docker is required in order to run serverless in local mode
+
 ## Usage
-Install serverless with:
+Install dependencies with:
 ```
-$ npm install -g serverless
-$ npm install --save-dev serverless-rust
+$ npm install
 ```
 
 And trigger lambda locally
 ```
-$ serverless invoke local -f page_fetcher -d \
+$ ./node_modules/.bin/serverless invoke local -f page_fetcher -d \
     '{
       "sites": [
         "https://bastion.rs",

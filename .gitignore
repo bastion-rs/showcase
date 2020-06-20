@@ -3,3 +3,4 @@ node_modules
 Cargo.lock
 target
 .serverless
+package-lock.json
