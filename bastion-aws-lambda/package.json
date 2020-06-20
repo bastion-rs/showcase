@@ -1,0 +1,16 @@
+{
+  "name": "bastion-aws-lambda",
+  "version": "0.0.1",
+  "description": "bastion aws lambda example",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless": "^1.73.1"
+  },
+  "devDependencies": {
+    "serverless-rust": "^0.3.8"
+  }
+}
