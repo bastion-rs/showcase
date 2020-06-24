@@ -44,7 +44,7 @@ fn main() {
                     round_robin %= workers.elems().len();
 
                     // Distribute tcp streams
-                    workers.elems()[round_robin].ask(stream.unwrap()).unwrap();
+                    workers.elems()[round_robin].ask_anonymously(stream.unwrap()).unwrap();
                 }
 
                 // Unreachable, but showing the logic explicitly is nice.
@@ -86,7 +86,7 @@ fn get_workers() -> ChildrenRef {
                                     .unwrap();
                                 file.write_all(&data_buf).await.unwrap();
 
-                                stream.write("OK".as_bytes()).unwrap();
+                                stream.write_all(b"OK").unwrap();
                             };
                             _: _ => ();
                         }
