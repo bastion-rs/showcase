@@ -7,18 +7,21 @@ In this example we are using Bastion to send a get request to given list of URLs
 Docker is required in order to run serverless in local mode
 
 ## Usage
+
 Install dependencies with:
+
 ```
 $ npm install
 ```
 
 And trigger lambda locally
+
 ```
 $ ./node_modules/.bin/serverless invoke local -f page_fetcher -d \
     '{
       "sites": [
-        "https://bastion.rs",
-        "https://blog.bastion.rs",
+        "https://www.bastion-rs.com",
+        "https://blog.bastion-rs.com",
         "http://google.com",
         "https://docs.rs/",
         "https://crates.io/",
